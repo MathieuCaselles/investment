@@ -1,8 +1,6 @@
-import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
+import React, { useRef, useState } from 'react';
+import { IonApp, IonButton, IonCard, IonCardContent, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonRow, IonTitle, IonToolbar } from '@ionic/react';
+import { calculatorOutline, refreshOutline } from 'ionicons/icons'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -23,15 +21,94 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route path="/home" component={Home} exact={true} />
-        <Route exact path="/" render={() => <Redirect to="/home" />} />
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+
+  const priceInput = useRef<HTMLIonInputElement>(null);
+  const rentInput = useRef<HTMLIonInputElement>(null);
+  const [result, setResult] = useState<number>()
+
+  const calculate = () => {
+    const priceValue = priceInput.current!.value;
+    const rentValue = rentInput.current!.value;
+
+    if (!priceValue || !rentValue) return
+    const renta = +rentValue * 12 * 100 / +priceValue;
+    setResult(renta)
+  }
+
+  const reset = () => {
+    priceInput.current!.value = "";
+    rentInput.current!.value = "";
+    setResult(undefined);
+  }
+
+  return (
+    <IonApp>
+      <IonHeader>
+        <IonToolbar color="primary">
+          <IonTitle>Investment</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
+        <IonGrid>
+
+          <IonRow>
+            <IonCol>
+              <IonItem  >
+                <IonLabel position="floating">
+                  Price
+              </IonLabel>
+                <IonInput type="number" ref={priceInput}></IonInput>
+              </IonItem>
+            </IonCol>
+          </IonRow>
+
+          <IonRow>
+            <IonCol>
+              <IonItem >
+                <IonLabel position="floating">
+                  Rent
+              </IonLabel>
+                <IonInput type="number" ref={rentInput}></IonInput>
+              </IonItem>
+            </IonCol>
+          </IonRow>
+
+
+
+          <IonRow>
+            <IonCol className="ion-text-left">
+              <IonButton onClick={calculate}>
+                <IonIcon slot="start" icon={calculatorOutline}></IonIcon>
+              Calculate</IonButton>
+            </IonCol>
+            <IonCol className="ion-text-right">
+              <IonButton fill="outline" onClick={reset}>
+                <IonIcon slot="start" icon={refreshOutline}></IonIcon>
+            Reset</IonButton>
+            </IonCol>
+          </IonRow>
+
+
+
+
+          <IonRow>
+            <IonCol>
+              {
+                result &&
+                <IonCard>
+                  <IonCardContent className="ion-text-center">
+                    {result}%
+                    </IonCardContent>
+                </IonCard>
+              }
+
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      </IonContent>
+    </IonApp>
+  )
+};
 
 export default App;
